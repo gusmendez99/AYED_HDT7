@@ -2,6 +2,12 @@
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+/**
+ * Main class that shows the JavaFX stage
+ * @author Gustavo Méndez
+ * @version 1.0
+ * @since 21/3/2019
+ */
 public class Main extends Application {
 
     /**

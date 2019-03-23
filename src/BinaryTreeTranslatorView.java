@@ -17,8 +17,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-
+/**
+ * Class that manages the operations between the user interface and the logic of the program
+ * manages the JavaFx stages and operates in the BinarySearchTree instance to feed the user
+ * @author Gustavo Méndez
+ * @author Luis Urbina
+ * @version 1.0
+ * @since  21/03/2019
+ */
 public class BinaryTreeTranslatorView {
 
     /**
@@ -27,11 +33,19 @@ public class BinaryTreeTranslatorView {
     private TextArea inputTextArea;
     private TextArea outputTextArea;
     private FileChooser fileChooser;
-
+    /**
+     * Initialize the BinarySearchTree
+     */
     private BinarySearchTree<Association<String, String>> myBinarySearchTree = new BinarySearchTree<>();
-
+    /**
+     * Control variables
+     */
     private boolean isDictionaryLoaded, isTextToTranslateLoaded = false;
 
+    /**
+     * Show the stage
+     * @param stage the stage to show in the current context
+     */
     public void show(Stage stage) {
         inputTextArea = new TextArea("");
         outputTextArea = new TextArea("...");
@@ -51,7 +65,6 @@ public class BinaryTreeTranslatorView {
 
         Scene scene = new Scene(border, 800, 600);
         stage.setTitle("Translator");
-        //scene.getStylesheets().add(Calculadora.class.getResource("estilo.css").toExternalForm());
         stage.setScene(scene);
         stage.show();
 
@@ -130,6 +143,8 @@ public class BinaryTreeTranslatorView {
                         String[] temp = text.split(",");
                         if(temp.length > 1)
                         {
+                            //Create a new association with the value of the temp[0] = word in english
+                            //temp[1] = word in spanish
                             Association<String, String> a = new Association(temp[0], temp[1]);
                             myBinarySearchTree.add(a);
                         }
@@ -179,9 +194,11 @@ public class BinaryTreeTranslatorView {
                     String[] textToTranslate = line.split(" ");
                     for(String word: textToTranslate)
                     {
+                        //for each word get the association that matches the key
                         Association<String, String> a = myBinarySearchTree.get(new Association<>(word, null));
                         if(a != null)
                         {
+                            //append the association value if exists to the outputTextArea variable
                             outputTextArea.appendText(a.getValue().toString());
                         }
                         else
