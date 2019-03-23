@@ -4,23 +4,9 @@ import java.util.List;
 public class BinarySearchTree<E extends Comparable<E>>{
 
     protected BinaryTree<E> root;
-    int size;
 
-
-    public BinarySearchTree()
-    {
+    public BinarySearchTree() {
         root = new BinaryTree<>();
-    }
-
-    public boolean isEmpty()
-    {
-        return root.isEmpty();
-    }
-
-
-    public void clear()
-    {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public void add(E value)
@@ -39,26 +25,17 @@ public class BinarySearchTree<E extends Comparable<E>>{
     }
 
 
-    public boolean contains(E key)
-    {
+    public boolean contains(E key){
         return get(key) == key;
     }
 
 
-    public E get(E key)
-    {
+    public E get(E key) {
         if(root.isEmpty()) return null;
         BinaryTree<E> node = searchNodeRecursive(root, key);
         if(node.isEmpty()) return null;
         return node.value();
     }
-
-
-    public E remove(E value)
-    {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
 
     public List<E> inOrder()
     {
@@ -73,9 +50,9 @@ public class BinarySearchTree<E extends Comparable<E>>{
         if(node.isEmpty()) return node;
         else
         {
-            int steC =  node.value().compareTo(key);
-            if (steC == 0 )return node;
-            else if (steC > 0)
+            int compareResult =  node.value().compareTo(key);
+            if (compareResult == 0 ) return node;
+            else if (compareResult > 0)
             {
                 return searchNodeRecursive(node.getLeft(), key);
             }
