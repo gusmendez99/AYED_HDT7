@@ -20,7 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-public class TreeTranslatorView {
+public class BinaryTreeTranslatorView {
 
     /**
      * TextAreas for show the results
@@ -163,14 +163,14 @@ public class TreeTranslatorView {
             }
 
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(TreeTranslatorView.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BinaryTreeTranslatorView.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(TreeTranslatorView.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BinaryTreeTranslatorView.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
                 bufferedReader.close();
             } catch (IOException ex) {
-                Logger.getLogger(TreeTranslatorView.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(BinaryTreeTranslatorView.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 

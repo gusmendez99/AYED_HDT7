@@ -18,8 +18,8 @@ public class Main extends Application {
      */
     @Override
     public void start(Stage primaryStage) {
-        TreeTranslatorView cardReaderView = new TreeTranslatorView();
-        cardReaderView.show(primaryStage);
+        BinaryTreeTranslatorView binaryTreeTranslatorView = new BinaryTreeTranslatorView();
+        binaryTreeTranslatorView.show(primaryStage);
     }
 
 

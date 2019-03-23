@@ -2,7 +2,9 @@ import java.util.Map;
 
 public class Association<K,V> extends Object implements Comparable, Map.Entry{
 
+    //Key = english
     private K key;
+    //Value = spanish
     private V value;
 
     public Association(K key, V value){
