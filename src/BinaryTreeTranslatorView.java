@@ -13,7 +13,6 @@ import javafx.stage.Stage;
 
 import java.io.*;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -25,16 +24,17 @@ public class BinaryTreeTranslatorView {
     /**
      * TextAreas for show the results
      */
-    private TextArea input;
-    private TextArea result;
+    private TextArea inputTextArea;
+    private TextArea outputTextArea;
     private FileChooser fileChooser;
+
+    private BinarySearchTree<Association<String, String>> myBinarySearchTree = new BinarySearchTree<>();
 
     private boolean isDictionaryLoaded, isTextToTranslateLoaded = false;
 
-
     public void show(Stage stage) {
-        input = new TextArea("");
-        result = new TextArea("...");
+        inputTextArea = new TextArea("");
+        outputTextArea = new TextArea("...");
         fileChooser = new FileChooser();
 
         fileChooser.getExtensionFilters().addAll(
@@ -74,11 +74,36 @@ public class BinaryTreeTranslatorView {
         buttonLoadTextToTranslate.setOnAction(e -> {
             File selectedFile = fileChooser.showOpenDialog(stage);
             if (selectedFile != null) {
-                ArrayList<String> myLines = readFile(selectedFile);
-                for (String line : myLines) {
-                    input.appendText("\n" + line);
+                BufferedReader bufferedReader = null;
+                try {
+                    bufferedReader = new BufferedReader(new FileReader(selectedFile));
+                    String text;
+                    while ((text = bufferedReader.readLine()) != null) {
+                        inputTextArea.appendText("\n" + text);
+                    }
+
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(BinaryTreeTranslatorView.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(BinaryTreeTranslatorView.class.getName()).log(Level.SEVERE, null, ex);
+                } finally {
+                    try {
+                        bufferedReader.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(BinaryTreeTranslatorView.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
+
+                //TODO: Show a dialog with successful message
                 isTextToTranslateLoaded = true;
+
+                //Dictionary and/or text haven't been loaded
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Text file loaded!");
+                alert.setHeaderText("Text file loaded successfully");
+                alert.setContentText("Try to translate your text...");
+                alert.showAndWait();
+
             }
         });
 
@@ -88,10 +113,54 @@ public class BinaryTreeTranslatorView {
         buttonLoadDictionary.setOnAction(e -> {
             File selectedFile = fileChooser.showOpenDialog(stage);
             if (selectedFile != null) {
+
+                BufferedReader bufferedReader = null;
+                try {
+                    bufferedReader = new BufferedReader(new FileReader(selectedFile));
+                    String text;
+                    while ((text = bufferedReader.readLine()) != null) {
+                        if(text.charAt(0) == '(')
+                        {
+                            text = text.substring(1);
+                        }
+                        if(text.charAt(text.length() - 1) == ')')
+                        {
+                            text = text.substring(0, text.length() - 1);
+                        }
+                        String[] temp = text.split(",");
+                        if(temp.length > 1)
+                        {
+                            Association<String, String> a = new Association(temp[0], temp[1]);
+                            myBinarySearchTree.add(a);
+                        }
+                    }
+
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(BinaryTreeTranslatorView.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(BinaryTreeTranslatorView.class.getName()).log(Level.SEVERE, null, ex);
+                } finally {
+                    try {
+                        bufferedReader.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(BinaryTreeTranslatorView.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+
                 isDictionaryLoaded = true;
+                //TODO: Show a dialog with successful message, and content
 
-                //TODO: process dictionary with the saved data
+                List<Association<String, String>> list = myBinarySearchTree.inOrder();
+                String dictionaryContent = "";
 
+                for(Association association: list) dictionaryContent += association.getKey() + "," + association.getValue() + "\n";
+
+                //Dictionary and/or text haven't been loaded
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Dictionary loaded!");
+                alert.setHeaderText("Your dictionary was loaded...");
+                alert.setContentText("Contains this words:\n" + dictionaryContent);
+                alert.showAndWait();
             }
         });
 
@@ -102,12 +171,28 @@ public class BinaryTreeTranslatorView {
         buttonRun.setOnAction(e -> {
 
             if(isTextToTranslateLoaded && isDictionaryLoaded){
-                //Split the input by lines and store in an Array
-                List<String> initLines = Arrays.asList(input.getText().split("\n"));
+                //Split the inputTextArea by lines and store in an Array
+                List<String> initLines = Arrays.asList(inputTextArea.getText().split("\n"));
 
                 for (String line : initLines) {
-                    //TODO: Translate each line in this ArrayList, append to result TextArea
+                    //TODO: Translate each line in this ArrayList, append to outputTextArea TextArea
+                    String[] textToTranslate = line.split(" ");
+                    for(String word: textToTranslate)
+                    {
+                        Association<String, String> a = myBinarySearchTree.get(new Association<>(word, null));
+                        if(a != null)
+                        {
+                            outputTextArea.appendText(a.getValue().toString());
+                        }
+                        else
+                        {
+                            outputTextArea.appendText(" "+ "*" + word + "*" + " ");
+                        }
+                    }
+                    outputTextArea.appendText("\n");
+
                 }
+
             } else {
                 //Dictionary and/or text haven't been loaded
                 Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -126,14 +211,15 @@ public class BinaryTreeTranslatorView {
             e1.printStackTrace();
         }
 
-        result.appendText("Output" + "\n");
+        outputTextArea.appendText("Output" + "\n");
 
-        //Button for clear the input data
+        //Button for clear the inputTextArea data
         Button buttonClear = new Button("Clear");
         buttonClear.setPrefSize(100, 20);
         buttonClear.setOnAction(e -> {
-            input.clear();
-            result.clear();
+            inputTextArea.clear();
+            outputTextArea.clear();
+            outputTextArea.appendText("Output" + "\n");
             isDictionaryLoaded = isTextToTranslateLoaded = false;
         });
 
@@ -143,43 +229,8 @@ public class BinaryTreeTranslatorView {
     }
 
 
-
     /**
-     * For read a file line by line
-     *
-     * @param file File object which have the math operation
-     * @return an ArrayList of String lines of the file
-     */
-    private ArrayList<String> readFile(File file) {
-        ArrayList<String> lines = new ArrayList<>();
-        BufferedReader bufferedReader = null;
-
-        try {
-
-            bufferedReader = new BufferedReader(new FileReader(file));
-            String text;
-            while ((text = bufferedReader.readLine()) != null) {
-                lines.add(text);
-            }
-
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(BinaryTreeTranslatorView.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(BinaryTreeTranslatorView.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                bufferedReader.close();
-            } catch (IOException ex) {
-                Logger.getLogger(BinaryTreeTranslatorView.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-        return lines;
-    }
-
-
-    /**
-     * For add a TextArea to the screen, and show the result
+     * For add a TextArea to the screen, and show the outputTextArea
      *
      * @return a filled HBox to add to the UI
      */
@@ -189,11 +240,11 @@ public class BinaryTreeTranslatorView {
         vbox.setSpacing(8);
 
         //Adding the TextArea to the VBox
-        input.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-        vbox.getChildren().add(input);
+        inputTextArea.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+        vbox.getChildren().add(inputTextArea);
 
-        result.setFont(Font.font("Arial", FontWeight.MEDIUM, 14));
-        vbox.getChildren().add(result);
+        outputTextArea.setFont(Font.font("Arial", FontWeight.MEDIUM, 14));
+        vbox.getChildren().add(outputTextArea);
 
 
         return vbox;

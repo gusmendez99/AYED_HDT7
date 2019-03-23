@@ -1,6 +1,6 @@
 import java.util.Map;
 
-public class Association<K,V> extends Object implements Comparable, Map.Entry{
+public class Association<K extends Comparable<K>,V> implements Comparable<Association<K,V>>{
 
     //Key = english
     private K key;
@@ -12,25 +12,22 @@ public class Association<K,V> extends Object implements Comparable, Map.Entry{
         this.value = value;
     }
 
-    @Override
-    public int compareTo(Object o) {
-        Association ob = (Association) o;
-        return key.toString().compareToIgnoreCase(ob.key.toString());
-    }
-
-    @Override
     public Object getKey() {
         return key;
     }
 
-    @Override
     public Object getValue() {
         return value;
     }
 
-    @Override
     public Object setValue(Object value) {
         V val = (V) value;
         return this.value = val;
+    }
+
+    @Override
+    public int compareTo(Association<K, V> o) {
+        Association ob = (Association) o;
+        return key.toString().compareToIgnoreCase(ob.key.toString());
     }
 }
